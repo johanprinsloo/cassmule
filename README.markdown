@@ -1,4 +1,4 @@
-## Test Project for Spray Akka Cassandra web service
+## Test Project for a Spray, Akka and Cassandra web service
 
 ```
 sbt
