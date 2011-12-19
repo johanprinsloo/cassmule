@@ -13,6 +13,8 @@ class Boot {
   }
   
   MuleInception inseminate
+  
+  MuleInception birth
 
   val httpService = actorOf(new HttpService(mainModule.testService))
   val rootService = actorOf(new RootService(httpService))

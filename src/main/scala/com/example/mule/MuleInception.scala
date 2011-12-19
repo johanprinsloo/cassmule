@@ -1,13 +1,24 @@
 package com.example.mule
+import scala.collection.JavaConversions._
 import org.apache.cassandra.service.EmbeddedCassandraService
 import org.apache.thrift.transport.TSocket
 import org.apache.cassandra.thrift.TBinaryProtocol
 import org.apache.cassandra.thrift.Cassandra
 import org.apache.cassandra.thrift.CassandraDaemon
+import me.prettyprint.cassandra.service.CassandraHostConfigurator
+import me.prettyprint.cassandra.service.ThriftCluster
+import me.prettyprint.hector.api.factory.HFactory
+import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition
+import me.prettyprint.hector.api.ddl.ComparatorType
+import me.prettyprint.cassandra.service.ThriftKsDef
+import java.util.Arrays
 
 object MuleInception {
 
   val cassandra = new EmbeddedCassandraService()
+  val keyspaceName = "mulespace"
+  val colFamName = "evses"
+  val replicationFactor = 1
 
   def inseminate = {
     val currdir = System.getProperty("user.dir")
@@ -33,6 +44,33 @@ object MuleInception {
         }
       }
     }
+  }
+
+  def birth = {
+
+    val cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9160")
+
+    val cfDef: ColumnFamilyDefinition = HFactory.createColumnFamilyDefinition(keyspaceName,colFamName, ComparatorType.LONGTYPE)
+    
+    val newKeyspaceDef = HFactory.createKeyspaceDefinition(keyspaceName,                 
+                                                           ThriftKsDef.DEF_STRATEGY_CLASS,  
+                                                           replicationFactor, 
+                                                           Arrays.asList(cfDef));
+  
+    val testcsf = asScalaBuffer( newKeyspaceDef.getCfDefs() )
+    println(">>> keyscape " + testcsf.toList.toString() )
+    
+    if ((cluster.describeKeyspace(keyspaceName)) == null) {
+      cluster.addKeyspace(newKeyspaceDef, true)
+    }
+    
+    cluster.describeKeyspaces() foreach { keysp =>
+    	println( keysp.getName() )
+    	asScalaBuffer( keysp.getCfDefs() )  foreach { colfam =>
+    		println( "\t" + colfam.getName() + " : " + colfam.getColumnType() + " : sorted as : " + colfam.getComparatorType().getTypeName() )
+    	}
+    }
+    		
   }
 
 }
