@@ -41,7 +41,7 @@ object Dependencies {
     val specs2  = "1.6.1"
     val jetty   = "8.0.3.v20111011"
     val slf4j   = "1.6.1"
-    val logback = "0.9.29"
+    val logback = "0.9.30"
     val cassandra = "1.0.6"
     val hector = "1.0-1"
   }
