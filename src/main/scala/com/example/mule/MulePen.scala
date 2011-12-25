@@ -13,6 +13,7 @@ import me.prettyprint.hector.api.mutation.Mutator
 import me.prettyprint.hector.api.beans.ColumnSlice
 import me.prettyprint.hector.api.query.{QueryResult, SliceQuery}
 import cc.spray.http._
+import cc.spray.http.MediaTypes._
 import cc.spray._
 import com.example.domain.Evse
 
@@ -80,8 +81,8 @@ object MulePen {
 
       //val contenttyoe = ContentType(`application/json`)
 
-      //val content = HttpContent( ContentType(`application/json`), json)
-      HttpResponse(200, json)
+      val content = HttpContent( ContentType(`application/json`), json)
+      HttpResponse(200, content)
 
     } catch {
       case ex: Exception => HttpResponse(404, ex.getMessage + " : " + ex.toString)
