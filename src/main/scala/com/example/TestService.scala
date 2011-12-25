@@ -27,7 +27,10 @@ trait TestService extends Directives {
             }
         }
 
-      }
+      } ~
+    path("mu-a6c84d2e-1b3b9037-722e9eba-fccf6d7a") {
+      _.complete("42")
+    }
   }
 
 }
