@@ -1,3 +1,3 @@
 package com.example.domain
 
-case class Evse( name: String, netAddress: String,  manufacturer: String,  model: String)
+case class Evse( name: String, netAddress: String,  manufacturer: String,  model: String, serial: String)

@@ -22,6 +22,8 @@ object MulePen {
 
   val keyspaceName = "mulespace"
   val colFamName = "evses"
+  val deviceColFamName = "evse_dev"
+  val chparamColFamName = "evse_chp"
 
   val cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9160");
   val ko = createKeyspace(keyspaceName, cluster)
@@ -29,15 +31,11 @@ object MulePen {
   val sl = new LongSerializer()
 
 
-  def putEvse(content: String, evseId: Long): HttpResponse = {
+  def putEvseFree(content: String, evseId: Long): HttpResponse = {
 
     try {
       val input = parse(content)
 
-      //validate before commit
-      //val evse = input.extract[Evse]
-
-      //put data
       val inmapp : Map[String, String] = input.values.asInstanceOf[Map[String,String]]
 
       val m: Mutator[String] = createMutator(ko, se)
@@ -59,12 +57,131 @@ object MulePen {
     }
   }
 
-  def getEvse(id: Long): HttpResponse = {
+  def getEvseFree(id: Long): HttpResponse = {
     try {
       val q: SliceQuery[String, String, String] = HFactory.createSliceQuery(ko, se, se ,se )
       q.setColumnFamily(colFamName)
       .setKey(id.toString)
-      .setRange("a", "z", false, 20);
+      .setRange("a", "z", false, 20)
+
+      val colist = q.execute().get().getColumns
+
+      var json = "{"
+      val it = colist.iterator
+      while(it.hasNext() ) {
+        val col = it.next()
+        json += ( "\"" + col.getName + "\":" + "\"" + col.getValue + "\"" )
+        if( it.hasNext ) json += ","
+      }
+      json += "}"
+
+      val content = HttpContent( ContentType(`application/json`), json)
+      HttpResponse(200, content)
+
+    } catch {
+      case ex: Exception => HttpResponse(404, ex.getMessage + " : " + ex.toString)
+    }
+
+  }
+
+  def putEvseDevice(content: String, evseId: Long): HttpResponse = {
+
+    try {
+      val input = parse(content)
+
+      //validate before commit
+      case class EVSE( name: String, netAddress: String,  manufacturer: String,  model: String, serial: String)
+      val evse = input.extract[EVSE]
+
+      //put data
+      val inmapp : Map[String, String] = input.values.asInstanceOf[Map[String,String]]
+
+      val m: Mutator[String] = createMutator(ko, se)
+
+      inmapp foreach  {
+        case (key : String,  value : String) => {
+          println(" evse : " + evseId.toString + "  inserting : " + key + " : " + value)
+          m.insert(evseId.toString, deviceColFamName, HFactory.createStringColumn(key, value))
+        }
+      }
+
+      HttpResponse(StatusCodes.Accepted)
+
+    } catch {
+      case ex: Exception => {
+        ex.printStackTrace()
+        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getMessage)
+      }
+    }
+  }
+
+  def getEvseDevice(id: Long): HttpResponse = {
+    try {
+      val q: SliceQuery[String, String, String] = HFactory.createSliceQuery(ko, se, se ,se )
+      q.setColumnFamily(deviceColFamName)
+        .setKey(id.toString)
+        .setRange("a", "z", false, 20)
+
+      //val result : QueryResult[ColumnSlice[String, String]] = q.execute();
+
+      val colist = q.execute().get().getColumns
+
+      var json = "{"
+      val it = colist.iterator
+      while(it.hasNext() ) {
+        val col = it.next()
+        json += ( "\"" + col.getName + "\":" + "\"" + col.getValue + "\"" )
+        if( it.hasNext ) json += ","
+      }
+      json += "}"
+
+      //val contenttyoe = ContentType(`application/json`)
+
+      val content = HttpContent( ContentType(`application/json`), json)
+      HttpResponse(200, content)
+
+    } catch {
+      case ex: Exception => HttpResponse(404, ex.getMessage + " : " + ex.toString)
+    }
+
+  }
+
+  def putEvseChp(content: String, evseId: Long): HttpResponse = {
+
+    try {
+      val input = parse(content)
+
+      //validate before commit
+      //val evse = input.extract[Evse]
+
+      //put data
+      val inmapp : Map[String, String] = input.values.asInstanceOf[Map[String,String]]
+
+      val m: Mutator[String] = createMutator(ko, se)
+
+      inmapp foreach  {
+        case (key : String,  value : String) => {
+          println(" evse : " + evseId.toString + "  inserting : " + key + " : " + value)
+          m.insert(evseId.toString, chparamColFamName, HFactory.createStringColumn(key, value))
+        }
+      }
+
+      HttpResponse(StatusCodes.Accepted)
+
+    } catch {
+      case ex: Exception => {
+        ex.printStackTrace()
+        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getMessage)
+      }
+    }
+  }
+
+  def getEvseChp(id: Long): HttpResponse = {
+    try {
+      val q: SliceQuery[String, String, String] = HFactory.createSliceQuery(ko, se, se ,se )
+      q.setColumnFamily(chparamColFamName)
+        .setKey(id.toString)
+        .setRange("a", "z", false, 20)
 
       //val result : QueryResult[ColumnSlice[String, String]] = q.execute();
 

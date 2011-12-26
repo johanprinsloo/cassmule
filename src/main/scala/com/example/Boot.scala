@@ -8,7 +8,7 @@ import com.example.mule.MuleInception
 
 class Boot {
   
-  val mainModule = new TestService {
+  val mainModule = new EvseService {
     // bake your module cake here
   }
   
@@ -16,7 +16,7 @@ class Boot {
   
   MuleInception birth
 
-  val httpService = actorOf(new HttpService(mainModule.testService))
+  val httpService = actorOf(new HttpService(mainModule.evseService))
   val rootService = actorOf(new RootService(httpService))
 
   Supervisor(

@@ -19,6 +19,8 @@ object MuleInception {
   val cassandra = new EmbeddedCassandraService()
   val keyspaceName = "mulespace"
   val colFamName = "evses"
+  val deviceColFamName = "evse_dev"
+  val chparamColFamName = "evse_chp"
   val replicationFactor = 1
 
   def inseminate = {
@@ -56,11 +58,15 @@ object MuleInception {
 
       val cfDef: ColumnFamilyDefinition =
         HFactory.createColumnFamilyDefinition(keyspaceName, colFamName, ComparatorType.UTF8TYPE)
+      val cfDevDef: ColumnFamilyDefinition =
+        HFactory.createColumnFamilyDefinition(keyspaceName, deviceColFamName, ComparatorType.UTF8TYPE)
+      val cfChpDef: ColumnFamilyDefinition =
+        HFactory.createColumnFamilyDefinition(keyspaceName, chparamColFamName, ComparatorType.UTF8TYPE)
 
       val newKeyspaceDef = HFactory.createKeyspaceDefinition(keyspaceName,
         ThriftKsDef.DEF_STRATEGY_CLASS,
         replicationFactor,
-        Arrays.asList(cfDef));
+        Arrays.asList(cfDef,cfDevDef,cfChpDef));
 
       val testcsf = asScalaBuffer(newKeyspaceDef.getCfDefs())
       println(">>> keyscape " + testcsf.toList.toString())
