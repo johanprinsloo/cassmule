@@ -90,8 +90,8 @@ object MulePen {
       val input = parse(content)
 
       //validate before commit
-      case class EVSE( name: String, netAddress: String,  manufacturer: String,  model: String, serial: String)
-      val evse = input.extract[EVSE]
+      implicit val formats = DefaultFormats
+      val evse = input.extract[Evse]
 
       //put data
       val inmapp : Map[String, String] = input.values.asInstanceOf[Map[String,String]]
