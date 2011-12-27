@@ -21,8 +21,7 @@ trait EvseService extends Directives {
           put {
             content(as[String]) {
               evseContent =>
-                MulePen.putEvseFree(evseContent, evseId)
-                _.complete("OK for put evse")
+                _.complete(MulePen.putEvseFree(evseContent, evseId))
             }
           }
       }
@@ -32,13 +31,12 @@ trait EvseService extends Directives {
       path(LongNumber) {
         evseId =>
           get {
-            _.complete(MulePen.getEvseFree(evseId))
+            _.complete(MulePen.getEvseDevice(evseId))
           } ~
             put {
               content(as[String]) {
                 evseContent =>
-                  MulePen.putEvseFree(evseContent, evseId)
-                  _.complete("OK for put evse")
+                  _.complete(MulePen.putEvseDevice(evseContent, evseId))
               }
             }
       }
@@ -48,20 +46,15 @@ trait EvseService extends Directives {
       path(LongNumber) {
         evseId =>
           get {
-            _.complete(MulePen.getEvseFree(evseId))
+            _.complete(MulePen.getEvseChp(evseId))
           } ~
             put {
               content(as[String]) {
                 evseContent =>
-                  MulePen.putEvseFree(evseContent, evseId)
-                  _.complete("OK for put evse")
+                  _.complete(MulePen.putEvseChp(evseContent, evseId))
               }
             }
       }
-
-    } ~
-    path("mu-a6c84d2e-1b3b9037-722e9eba-fccf6d7a") {
-      _.complete("42")
     }
   }
 

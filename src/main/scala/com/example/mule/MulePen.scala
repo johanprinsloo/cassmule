@@ -52,7 +52,7 @@ object MulePen {
     } catch {
       case ex: Exception => {
         ex.printStackTrace()
-        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getMessage)
+        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getCause.toString + " : " + ex.getMessage)
       }
     }
   }
@@ -68,7 +68,7 @@ object MulePen {
 
       var json = "{"
       val it = colist.iterator
-      while(it.hasNext() ) {
+      while(it.hasNext ) {
         val col = it.next()
         json += ( "\"" + col.getName + "\":" + "\"" + col.getValue + "\"" )
         if( it.hasNext ) json += ","
@@ -88,13 +88,13 @@ object MulePen {
 
     try {
       val input = parse(content)
+      //put data
+      val inmapp : Map[String, String] = input.values.asInstanceOf[Map[String,String]]
 
       //validate before commit
       implicit val formats = DefaultFormats
       val evse = input.extract[Evse]
 
-      //put data
-      val inmapp : Map[String, String] = input.values.asInstanceOf[Map[String,String]]
 
       val m: Mutator[String] = createMutator(ko, se)
 
@@ -110,7 +110,7 @@ object MulePen {
     } catch {
       case ex: Exception => {
         ex.printStackTrace()
-        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getMessage)
+        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getCause.toString + " : " + ex.getMessage)
       }
     }
   }
@@ -120,22 +120,18 @@ object MulePen {
       val q: SliceQuery[String, String, String] = HFactory.createSliceQuery(ko, se, se ,se )
       q.setColumnFamily(deviceColFamName)
         .setKey(id.toString)
-        .setRange("a", "z", false, 20)
-
-      //val result : QueryResult[ColumnSlice[String, String]] = q.execute();
+        .setRange("","",false,100)
 
       val colist = q.execute().get().getColumns
 
       var json = "{"
       val it = colist.iterator
-      while(it.hasNext() ) {
+      while(it.hasNext ) {
         val col = it.next()
         json += ( "\"" + col.getName + "\":" + "\"" + col.getValue + "\"" )
         if( it.hasNext ) json += ","
       }
       json += "}"
-
-      //val contenttyoe = ContentType(`application/json`)
 
       val content = HttpContent( ContentType(`application/json`), json)
       HttpResponse(200, content)
@@ -171,7 +167,7 @@ object MulePen {
     } catch {
       case ex: Exception => {
         ex.printStackTrace()
-        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getMessage)
+        HttpResponse(StatusCodes.BadRequest, "No Write: " + ex.getCause.toString + " : " + ex.getMessage)
       }
     }
   }
@@ -189,7 +185,7 @@ object MulePen {
 
       var json = "{"
       val it = colist.iterator
-      while(it.hasNext() ) {
+      while(it.hasNext ) {
         val col = it.next()
         json += ( "\"" + col.getName + "\":" + "\"" + col.getValue + "\"" )
         if( it.hasNext ) json += ","
