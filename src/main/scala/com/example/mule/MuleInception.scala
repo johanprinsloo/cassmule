@@ -13,6 +13,7 @@ import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition
 import me.prettyprint.hector.api.ddl.ComparatorType
 import me.prettyprint.cassandra.service.ThriftKsDef
 import java.util.Arrays
+import me.prettyprint.cassandra.connection.SpeedForJOpTimer
 
 object MuleInception {
 
@@ -38,6 +39,9 @@ object MuleInception {
             cassandraDaemon.init(null)
 
             def run = cassandraDaemon.start
+
+            val cassandraHostConfig = new CassandraHostConfigurator
+            cassandraHostConfig.setOpTimer(new SpeedForJOpTimer("Mule-Cluster"))
           }
           val t = new Thread(cassandra)
           t.setDaemon(true)
@@ -48,13 +52,14 @@ object MuleInception {
         }
       }
     }
+
   }
 
   def birth = {
 
     try {
 
-      val cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9160")
+      val cluster = HFactory.getOrCreateCluster("Mule-Cluster", "localhost:9160")
 
       val cfDef: ColumnFamilyDefinition =
         HFactory.createColumnFamilyDefinition(keyspaceName, colFamName, ComparatorType.UTF8TYPE)
