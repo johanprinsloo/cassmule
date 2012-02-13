@@ -23,7 +23,8 @@ object Build extends sbt.Build {
         Container.jettyWebApp,
         Container.akkaSlf4j,
         Container.slf4j,
-        Container.logback
+        Container.logback,
+        Container.grizzled
       )
     )
 }
@@ -41,9 +42,10 @@ object Dependencies {
     val specs2  = "1.6.1"
     val jetty   = "8.0.3.v20111011"
     val slf4j   = "1.6.1"
-    val logback = "0.9.29"
+    val logback = "0.9.30"
     val cassandra = "1.0.6"
     val hector = "1.0-1"
+    val grizzled = "0.6.6"
   }
 
   object Compile {
@@ -63,5 +65,6 @@ object Dependencies {
     val akkaSlf4j   = "se.scalablesolutions.akka" %  "akka-slf4j"      % V.akka
     val slf4j       = "org.slf4j"                 %  "slf4j-api"       % V.slf4j
     val logback     = "ch.qos.logback"            %  "logback-classic" % V.logback
+    val grizzled    = "org.clapper"               %%  "grizzled-slf4j"  % V.grizzled
   }
 }

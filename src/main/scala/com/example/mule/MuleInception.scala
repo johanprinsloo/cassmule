@@ -1,4 +1,5 @@
 package com.example.mule
+
 import scala.collection.JavaConversions._
 import org.apache.cassandra.service.EmbeddedCassandraService
 import org.apache.thrift.transport.TSocket
@@ -12,12 +13,15 @@ import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition
 import me.prettyprint.hector.api.ddl.ComparatorType
 import me.prettyprint.cassandra.service.ThriftKsDef
 import java.util.Arrays
+import me.prettyprint.cassandra.connection.SpeedForJOpTimer
 
 object MuleInception {
 
   val cassandra = new EmbeddedCassandraService()
   val keyspaceName = "mulespace"
   val colFamName = "evses"
+  val deviceColFamName = "evse_dev"
+  val chparamColFamName = "evse_chp"
   val replicationFactor = 1
 
   def inseminate = {
@@ -33,7 +37,11 @@ object MuleInception {
           val cassandra = new Runnable {
             val cassandraDaemon = new CassandraDaemon
             cassandraDaemon.init(null)
+
             def run = cassandraDaemon.start
+
+            val cassandraHostConfig = new CassandraHostConfigurator
+            cassandraHostConfig.setOpTimer(new SpeedForJOpTimer("Mule-Cluster"))
           }
           val t = new Thread(cassandra)
           t.setDaemon(true)
@@ -44,33 +52,47 @@ object MuleInception {
         }
       }
     }
+
   }
 
   def birth = {
 
-    val cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9160")
+    try {
 
-    val cfDef: ColumnFamilyDefinition = HFactory.createColumnFamilyDefinition(keyspaceName,colFamName, ComparatorType.LONGTYPE)
-    
-    val newKeyspaceDef = HFactory.createKeyspaceDefinition(keyspaceName,                 
-                                                           ThriftKsDef.DEF_STRATEGY_CLASS,  
-                                                           replicationFactor, 
-                                                           Arrays.asList(cfDef));
-  
-    val testcsf = asScalaBuffer( newKeyspaceDef.getCfDefs() )
-    println(">>> keyscape " + testcsf.toList.toString() )
-    
-    if ((cluster.describeKeyspace(keyspaceName)) == null) {
-      cluster.addKeyspace(newKeyspaceDef, true)
+      val cluster = HFactory.getOrCreateCluster("Mule-Cluster", "localhost:9160")
+
+      val cfDef: ColumnFamilyDefinition =
+        HFactory.createColumnFamilyDefinition(keyspaceName, colFamName, ComparatorType.UTF8TYPE)
+      val cfDevDef: ColumnFamilyDefinition =
+        HFactory.createColumnFamilyDefinition(keyspaceName, deviceColFamName, ComparatorType.UTF8TYPE)
+      val cfChpDef: ColumnFamilyDefinition =
+        HFactory.createColumnFamilyDefinition(keyspaceName, chparamColFamName, ComparatorType.UTF8TYPE)
+
+      val newKeyspaceDef = HFactory.createKeyspaceDefinition(keyspaceName,
+        ThriftKsDef.DEF_STRATEGY_CLASS,
+        replicationFactor,
+        Arrays.asList(cfDef,cfDevDef,cfChpDef));
+
+      val testcsf = asScalaBuffer(newKeyspaceDef.getCfDefs())
+      println(">>> keyscape " + testcsf.toList.toString())
+
+      if ((cluster.describeKeyspace(keyspaceName)) == null) {
+        cluster.addKeyspace(newKeyspaceDef, true)
+      }
+
+      cluster.describeKeyspaces() foreach {
+        keysp =>
+          println(keysp.getName())
+          keysp.getCfDefs() foreach {
+            colfam =>
+              println("\t" + colfam.getName() + " : " + colfam.getColumnType()
+                + " : sorted as : " + colfam.getComparatorType().getTypeName())
+          }
+      }
+    } catch {
+      case ex: Exception => ex.printStackTrace()
     }
-    
-    cluster.describeKeyspaces() foreach { keysp =>
-    	println( keysp.getName() )
-    	asScalaBuffer( keysp.getCfDefs() )  foreach { colfam =>
-    		println( "\t" + colfam.getName() + " : " + colfam.getColumnType() + " : sorted as : " + colfam.getComparatorType().getTypeName() )
-    	}
-    }
-    		
+
   }
 
 }
