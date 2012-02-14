@@ -25,7 +25,6 @@ trait EvseService extends Directives {
             }
           }
       }
-
     } ~
     pathPrefix("api/evse/dev") {
       path(LongNumber) {
@@ -40,7 +39,6 @@ trait EvseService extends Directives {
               }
             }
       }
-
     } ~
     pathPrefix("api/evse/chp") {
       path(LongNumber) {
@@ -57,5 +55,4 @@ trait EvseService extends Directives {
       }
     }
   }
-
 }
