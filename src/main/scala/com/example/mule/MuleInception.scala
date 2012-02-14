@@ -41,7 +41,7 @@ object MuleInception {
             def run = cassandraDaemon.start
 
             val cassandraHostConfig = new CassandraHostConfigurator
-            cassandraHostConfig.setOpTimer(new SpeedForJOpTimer("Mule-Cluster"))
+            //cassandraHostConfig.setOpTimer(new SpeedForJOpTimer("Mule-Cluster"))
           }
           val t = new Thread(cassandra)
           t.setDaemon(true)

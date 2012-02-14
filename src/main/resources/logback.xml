@@ -1,41 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="RootConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>error</level>
-        </filter>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
         <encoder>
-            <pattern>%msg %n</pattern>
+            <pattern>%date{MM/dd HH:mm:ss} %-5level[%thread] %logger{1} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="RootFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>cassmule.log</file>
-        <append>true</append>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>error</level>
-        </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>cassmule.log.%i</fileNamePattern>
-            <maxIndex>10</maxIndex>
-        </rollingPolicy>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <maxFileSize>50000</maxFileSize>
-        </triggeringPolicy>
-
+    <!-- <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>akka.log</file>
+        <append>false</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+            <pattern>%date{MM/dd HH:mm:ss} %-5level[%thread] %logger{1} - %msg%n</pattern>
         </encoder>
-    </appender>
+    </appender> -->
 
     <logger name="akka" level="DEBUG" />
     <logger name="org.eclipse.jetty" level="INFO" />
 
-    <root>
-        <level value="info"/>
-        <appender-ref ref="RootFileAppender"/>
-        <appender-ref ref="RootConsoleAppender"/>
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
     </root>
 
 </configuration>

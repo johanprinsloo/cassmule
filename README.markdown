@@ -1,6 +1,6 @@
 # Test Project for a Spray, Akka and Cassandra web service
 
-The project demonstrates mixed scema and schemaless data structures as well as type safe insert and retreival of data:
+The project demonstrates mixed scema and schemaless data structures as well as type safe insert and retrieval of data:
 
 ```/api/evse/{key}```  PUT and GET free form data - get whatever schema you put
 ```/api/evse/dev/{key}``` Strict Schema enforced - ```{}```
