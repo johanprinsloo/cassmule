@@ -218,7 +218,38 @@ object MulePen extends Logging  {
     } catch {
       case ex: Exception => HttpResponse(404, ex.getMessage + " : " + ex.toString)
     }
-
   }
+
+  /**
+   * get the current charging session for this charging device - create one if none
+   * @param id
+   * @return
+   */
+  def getEvseChs(id: Long): HttpResponse = {
+    try {
+      val q: SliceQuery[String, String, String] = HFactory.createSliceQuery(ko, se, se, se)
+      q.setColumnFamily(deviceColFamName)
+        .setKey(id.toString)
+        .setRange("", "", false, 100)
+
+      val colist = q.execute().get().getColumns
+
+      var json = "{"
+      val it = colist.iterator
+      while (it.hasNext) {
+        val col = it.next()
+        json += ("\"" + col.getName + "\":" + "\"" + col.getValue + "\"")
+        if (it.hasNext) json += ","
+      }
+      json += "}"
+
+      val content = HttpContent(ContentType(`application/json`), json)
+      HttpResponse(200, content)
+
+    } catch {
+      case ex: Exception => HttpResponse(404, ex.getMessage + " : " + ex.toString)
+    }
+  }
+
 
 }

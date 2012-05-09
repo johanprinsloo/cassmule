@@ -4,21 +4,21 @@ import cc.spray._
 import com.example.mule._
 import cc.spray.directives.LongNumber
 
-trait EvseService extends Directives {
+trait ChpService extends Directives {
 
   val evseService = {
     path("") {
       get {
-        _.complete("Spray with embedded Cassandra store\n\t Try /api/evse/1")
+        _.complete("Alt Spray with embedded Cassandra store\n\t Try /api/evse/1")
       }
     } ~
-      pathPrefix("api/evse") {
+      pathPrefix("api/chp") {
         path(LongNumber) {
           evseId =>
             get {
               _.complete(MulePen.getEvseFree(evseId))
             } ~
-              put {
+            put {
                 content(as[String]) {
                   evseContent =>
                     _.complete(MulePen.putEvseFree(evseContent, evseId))
@@ -27,7 +27,7 @@ trait EvseService extends Directives {
         }
 
       } ~
-      pathPrefix("api/evse/dev") {
+      pathPrefix("api/chp/dev") {
         path(LongNumber) {
           evseId =>
             get {
