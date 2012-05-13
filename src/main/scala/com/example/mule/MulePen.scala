@@ -21,13 +21,10 @@ import utils.Logging
 
 object MulePen extends Logging  {
 
-  val keyspaceName = "mulespace"
-  val colFamName = "evses"
-  val deviceColFamName = "evse_dev"
-  val chparamColFamName = "evse_chp"
+  import MuleParameters._
 
-  val cluster = HFactory.getOrCreateCluster("Mule Cluster", "localhost:9160");
-  val ko = createKeyspace(keyspaceName, cluster)
+  val cluster = HFactory.getOrCreateCluster(clusterName, "localhost:9160");
+  val ko = createKeyspace(keyspaceMuleName, cluster)
   val se = new StringSerializer()
   val sl = new LongSerializer()
   val si = new IntegerSerializer()

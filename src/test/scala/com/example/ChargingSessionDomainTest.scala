@@ -19,7 +19,7 @@ class ChargingSessionDomainTest extends FunSuite with ShouldMatchers {
                                 6.9856,
                                 ct,
                                 "USD",
-                                ChargingMetrics(11054,12.654,6.321,2.3654,15,0.654, Some("https://base/api/v1/evse/{id}/chs/{id}/metrics")),
+                                ChargingMetrics(Some(ct),11054,12.654,6.321,2.3654,15,0.654, Some("https://base/api/v1/evse/{id}/chs/{id}/metrics")),
                                 PriceOverride(false),
                                 DemandResponseOverride(false, Some( "https://base/api/v1/evse/{id}/chs/{id}/pro")),
                                 Some( Pev(1, Some("https://base/api/v1/pev/1")) ),
@@ -63,7 +63,7 @@ class ChargingSessionDomainTest extends FunSuite with ShouldMatchers {
       6.9856,
       ct,
       "USD",
-      ChargingMetrics(11054,12.654,6.321,2.3654,15,0.654),
+      ChargingMetrics(Some(ct),11054,12.654,6.321,2.3654,15,0.654),
       PriceOverride(false),
       DemandResponseOverride(false)
     )
@@ -98,10 +98,12 @@ class ChargingSessionDomainTest extends FunSuite with ShouldMatchers {
 
     import ChargingMetricsProtocol._
 
-    val chm = ChargingMetrics(11054,12.654,6.321,2.3654,15,0.654, Some("anyurl"))
+    val ct = 1336925714565L //Platform.currentTime
+    val chm = ChargingMetrics(Some(ct), 11054,12.654,6.321,2.3654,15,0.654, Some("anyurl"))
 
     chm.href should be (Some("anyurl"))
     chm should have (
+      'timeStamp (Some(ct)),
       'secondsElapsed  (BigDecimal(11054)),
       'peakKw  (12.654),
       'averageKw  (6.321),
@@ -121,7 +123,7 @@ class ChargingSessionDomainTest extends FunSuite with ShouldMatchers {
     val p_chm = p_chmj.convertTo[ChargingMetrics]
     p_chm should be === (chm)
 
-    val rjasn = """{"secondsElapsed":11054,"peakKw":12.654,"averageKw":6.321,"totalConsumedkWh":2.3654,"intervalTime":15,"intervalAvgKw":0.654,"href":"anyurl"}"""
+    val rjasn = """{"timeStamp":1336925714565,"secondsElapsed":11054,"peakKw":12.654,"averageKw":6.321,"totalConsumedkWh":2.3654,"intervalTime":15,"intervalAvgKw":0.654,"href":"anyurl"}"""
     val p_raw = JsonParser(rjasn)
     assert(p_raw.isInstanceOf[JsObject]==true)
 
@@ -129,7 +131,19 @@ class ChargingSessionDomainTest extends FunSuite with ShouldMatchers {
     p_rchm should be === (chm)
 
     rjasn.asJson.convertTo[ChargingMetrics] should be === (chm)
+  }
 
+  test("Collections of charging metrics") {
+
+    import ChargingMetricsProtocol._
+
+    val now = Platform.currentTime
+    val metrixes = 1 to 3 map ( i => {
+      ChargingMetrics( Some(now + (1000*i)),i, 12.654,0.654, 45.654, 1, 0.6547 ).toJson
+    })
+
+    metrixes.map( m => info( m.compactPrint ) )
+    assert(metrixes(2).isInstanceOf[JsObject] == true)
   }
 
 }

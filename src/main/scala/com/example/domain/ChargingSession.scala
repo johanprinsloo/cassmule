@@ -2,7 +2,7 @@ package com.example.domain
 
 import cc.spray.json.DefaultJsonProtocol
 
-case class ChargingMetrics(
+case class ChargingMetrics(  timeStamp : Option[Long],
                              secondsElapsed : Int,
                              peakKw : BigDecimal,
                              averageKw : BigDecimal,
@@ -13,7 +13,7 @@ case class ChargingMetrics(
                            )
 
 object ChargingMetricsProtocol extends DefaultJsonProtocol {
-  implicit val chmFormat = jsonFormat7(ChargingMetrics)
+  implicit val chmFormat = jsonFormat8(ChargingMetrics)
 }
 
 case class Pev (
